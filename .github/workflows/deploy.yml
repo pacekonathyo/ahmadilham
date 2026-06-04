@@ -2,26 +2,26 @@
 name: Deploy Web Akademis to Pages
 
 on:
-  # Berjalan otomatis setiap ada perubahan (push) di branch main
+  # Runs on pushes targeting the default branch
   push:
     branches: ["main"]
 
-  # Memungkinkan menjalankan deployment secara manual dari tab Actions
+  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# Mengatur izin token GitHub untuk proses deployment
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# Mencegah duplikasi deployment yang berjalan bersamaan
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
 concurrency:
   group: "pages"
   cancel-in-progress: true
 
 jobs:
-  # Proses Build aplikasi
+  # Build job
   build:
     runs-on: ubuntu-latest
     steps:
@@ -46,10 +46,10 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Folder hasil kompilasi Vite
+          # Match Vite dist compiler output
           path: './dist'
 
-  # Proses Deploy ke server GitHub Pages
+  # Deployment job
   deploy:
     environment:
       name: github-pages
