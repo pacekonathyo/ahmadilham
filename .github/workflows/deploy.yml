@@ -1,0 +1,62 @@
+# Simple workflow for deploying static content to GitHub Pages
+name: Deploy Web Akademis to Pages
+
+on:
+  # Berjalan otomatis setiap ada perubahan (push) di branch main
+  push:
+    branches: ["main"]
+
+  # Memungkinkan menjalankan deployment secara manual dari tab Actions
+  workflow_dispatch:
+
+# Mengatur izin token GitHub untuk proses deployment
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Mencegah duplikasi deployment yang berjalan bersamaan
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  # Proses Build aplikasi
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build Web App
+        run: npm run build
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Folder hasil kompilasi Vite
+          path: './dist'
+
+  # Proses Deploy ke server GitHub Pages
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
